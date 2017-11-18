@@ -87,7 +87,7 @@ public class UploadArchiveCommand extends AbstractCommand {
     }
 
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
         final String vaultName = options.valueOf(optionParser.vault);
         final List<File> optionsFiles = options.valuesOf(optionParser.upload);
         final List<String> nonOptions = options.nonOptionArguments();
@@ -96,6 +96,7 @@ public class UploadArchiveCommand extends AbstractCommand {
         for (File uploadFile : files) {
             this.upload(vaultName, uploadFile);
         }
+        return OK_RETURN_CODE;
     }
 
     @Override

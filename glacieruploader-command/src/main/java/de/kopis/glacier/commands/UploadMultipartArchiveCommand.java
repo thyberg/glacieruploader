@@ -59,7 +59,7 @@ public class UploadMultipartArchiveCommand extends AbstractCommand {
 
     // from:
     // http://docs.amazonwebservices.com/amazonglacier/latest/dev/uploading-an-archive-mpu-using-java.html
-    private void upload(final String vaultName, final File uploadFile, final Long partSize) {
+    private int upload(final String vaultName, final File uploadFile, final Long partSize) {
         Validate.notBlank(vaultName, "vaultName can not be blank");
         Validate.notNull(uploadFile, "uploadFile can not be null");
         Validate.notNull(partSize, "partSize can not be null");
@@ -82,15 +82,19 @@ public class UploadMultipartArchiveCommand extends AbstractCommand {
             } else {
                 log.error("Checksums are different, upload failed.");
             }
-
+            return OK_RETURN_CODE;
         } catch (final IOException e) {
             log.error("Something went wrong while multipart uploading " + uploadFile + "." + e.getLocalizedMessage(), e);
+            return IO_ERROR_RETURN_CODE;
         } catch (AmazonServiceException e) {
             log.error("Something went wrong at Amazon while uploading " + uploadFile + "." + e.getLocalizedMessage(), e);
+            return AMAZON_SERVICE_EXCEPTION_RETURN_CODE;
         } catch (NoSuchAlgorithmException e) {
             log.error("No such algorithm found " + e.getLocalizedMessage(), e);
+            return NO_SUCH_ALGORITHM_RETURN_CODE;
         } catch (AmazonClientException e) {
             log.error("Something went wrong with the Amazon Client." + e.getLocalizedMessage(), e);
+            return AMAZON_CLIENT_EXCEPTION_RETURN_CODE;
         }
     }
 
@@ -200,7 +204,7 @@ public class UploadMultipartArchiveCommand extends AbstractCommand {
     }
 
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
         final String vaultName = options.valueOf(optionParser.vault);
         final List<File> optionsFiles = options.valuesOf(optionParser.multipartUpload);
         final Long partSize = options.valueOf(optionParser.partSize);
@@ -208,8 +212,12 @@ public class UploadMultipartArchiveCommand extends AbstractCommand {
         final List<File> files = optionParser.mergeNonOptionsFiles(optionsFiles, nonOptions);
 
         for (File uploadFile : files) {
-            this.upload(vaultName, uploadFile, partSize);
+            final int retval = this.upload(vaultName, uploadFile, partSize);
+            if (retval != 0) {
+                return retval;
+            }
         }
+        return OK_RETURN_CODE;
     }
 
     @Override

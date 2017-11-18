@@ -65,11 +65,19 @@ public final class GlacierUploader {
 
     private static final Logger log = LoggerFactory.getLogger(GlacierUploader.class);
 
+    private static final int GENERAL_ERROR_RETURN_CODE = 1;
+    private static final int REGION_NOT_SPECIFIED_RETURN_CODE = 2;
+
+
     private GlacierUploader() {
         // do not instantiate
     }
 
     public static void main(String[] args) {
+        System.exit(exec(args));
+    }
+
+    public static int exec(String[] args) {
         // Get our options
         final GlacierUploaderOptionParser optionParser = new GlacierUploaderOptionParser(setupConfig());
         final OptionSet options;
@@ -79,7 +87,7 @@ public final class GlacierUploader {
             options = optionParser.parse(args);
         } catch (Exception e) {
             log.error("Something went wrong parsing the arguments", e);
-            return;
+            return 20;
         }
 
         String region = options.valueOf(optionParser.region);
@@ -102,10 +110,11 @@ public final class GlacierUploader {
         // last sanity check
         if(region == null) {
             log.error("Region is not configured.");
+            return 21;
         }
 
         // Launch
-        findAndExecCommand(region, options, optionParser);
+        return findAndExecCommand(region, options, optionParser);
     }
 
     public static CompositeConfiguration setupConfig() {
@@ -124,7 +133,7 @@ public final class GlacierUploader {
         return config;
     }
 
-    private static void findAndExecCommand(final String region, OptionSet options, GlacierUploaderOptionParser optionParser) {
+    private static int findAndExecCommand(final String region, OptionSet options, GlacierUploaderOptionParser optionParser) {
         Validate.notNull(region, "region can not be NULL");
         log.info("Using region: {}", region);
 
@@ -164,6 +173,6 @@ public final class GlacierUploader {
         AbstractCommand command = CommandFactory.get(options, optionParser);
 
         // Execute it
-        command.exec(options, optionParser);
+        return command.exec(options, optionParser);
     }
 }

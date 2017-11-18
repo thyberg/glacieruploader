@@ -35,6 +35,13 @@ import joptsimple.OptionSet;
 public abstract class AbstractCommand {
     protected final Logger log;
 
+    protected static final int OK_RETURN_CODE = 0;
+    protected static final int AMAZON_SERVICE_EXCEPTION_RETURN_CODE = 10;
+    protected static final int AMAZON_CLIENT_EXCEPTION_RETURN_CODE  = 11;
+    protected static final int IO_ERROR_RETURN_CODE = 12;
+    protected static final int FILE_NOT_FOUND_RETURN_CODE = 13;
+    protected static final int NO_SUCH_ALGORITHM_RETURN_CODE = 14;
+
     protected AWSCredentials credentials = null;
     protected AmazonGlacier client = null;
     protected AmazonSQS sqs = null;
@@ -52,7 +59,7 @@ public abstract class AbstractCommand {
         this.log = LoggerFactory.getLogger(this.getClass());
     }
 
-    public abstract void exec(OptionSet options, GlacierUploaderOptionParser optionParser);
+    public abstract int exec(OptionSet options, GlacierUploaderOptionParser optionParser);
 
     public abstract boolean valid(OptionSet options, GlacierUploaderOptionParser optionParser);
 

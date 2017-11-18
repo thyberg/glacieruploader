@@ -45,15 +45,17 @@ public class HelpCommand extends AbstractCommand {
     }
 
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
         if (!options.has(optionParser.help)) {
             log.info("Ooops, can't determine what you want to do. Check your options. " + System.getProperty("line.separator") +
                     "Do not forget that --vault and --region are mandatory for all commands." + System.getProperty("line.separator"));
         }
         try {
             optionParser.printHelpOn(out);
+            return OK_RETURN_CODE;
         } catch (final IOException e) {
             log.error("Can not print help", e);
+            return IO_ERROR_RETURN_CODE;
         }
     }
 

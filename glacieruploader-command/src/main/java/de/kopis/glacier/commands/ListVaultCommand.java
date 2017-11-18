@@ -50,7 +50,7 @@ public class ListVaultCommand extends AbstractCommand {
         this.outputStream = out;
     }
 
-    private void listVaults() {
+    private int listVaults() {
         log.info("Listing all vaults...");
 
         try {
@@ -60,14 +60,16 @@ public class ListVaultCommand extends AbstractCommand {
             for (DescribeVaultOutput vault : vaults) {
                 vaultPrinter.printVault(vault, outputStream);
             }
+            return OK_RETURN_CODE;
         } catch (final AmazonClientException e) {
             log.error("Can't list vaults.", e);
+            return AMAZON_CLIENT_EXCEPTION_RETURN_CODE;
         }
     }
 
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
-        listVaults();
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+        return listVaults();
     }
 
     @Override

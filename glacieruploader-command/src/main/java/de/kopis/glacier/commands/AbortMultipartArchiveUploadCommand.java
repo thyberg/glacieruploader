@@ -47,15 +47,18 @@ public class AbortMultipartArchiveUploadCommand extends AbstractCommand {
      * @see de.kopis.glacier.commands.AbstractCommand#exec(joptsimple.OptionSet, de.kopis.glacier.parsers.GlacierUploaderOptionParser)
      */
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
         final String vaultName = options.valueOf(optionParser.vault);
         final String uploadId = options.valueOf(optionParser.abortUpload);
         try {
             abortUpload(vaultName, uploadId);
+            return OK_RETURN_CODE;
         } catch (AmazonServiceException e) {
             log.error("Something went wrong at Amazon while aborting the multipart upload with id " + uploadId + ". " + e.getLocalizedMessage(), e);
+            return AMAZON_SERVICE_EXCEPTION_RETURN_CODE;
         } catch (AmazonClientException e) {
             log.error("Something went wrong with the Amazon Client.", e);
+            return AMAZON_CLIENT_EXCEPTION_RETURN_CODE;
         }
     }
 

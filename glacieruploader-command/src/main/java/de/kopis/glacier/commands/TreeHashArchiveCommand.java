@@ -37,19 +37,21 @@ public class TreeHashArchiveCommand extends AbstractCommand {
         super(client, sqs, sns);
     }
 
-    private void calculateTreeHash(File file) {
+    private int calculateTreeHash(File file) {
         if (file.exists()) {
             final String treeHash = TreeHashGenerator.calculateTreeHash(file);
             log.info(treeHash);
+            return OK_RETURN_CODE;
         } else {
             log.error("File '{}' not found", file.getAbsolutePath());
+            return FILE_NOT_FOUND_RETURN_CODE;
         }
     }
 
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
         final File file = options.valueOf(optionParser.calculateHash);
-        this.calculateTreeHash(file);
+        return this.calculateTreeHash(file);
     }
 
     @Override

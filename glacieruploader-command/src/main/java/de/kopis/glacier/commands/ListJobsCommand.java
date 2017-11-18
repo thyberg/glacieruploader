@@ -49,7 +49,7 @@ public class ListJobsCommand extends AbstractCommand {
     }
 
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
         log.info("Listing jobs...");
 
         final String vaultName = options.valueOf(optionParser.vault);
@@ -60,6 +60,7 @@ public class ListJobsCommand extends AbstractCommand {
         }
 
         log.info("Done.");
+        return OK_RETURN_CODE;
     }
 
     @Override

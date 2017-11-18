@@ -52,7 +52,7 @@ public class ReceiveArchivesListCommand extends AbstractCommand {
         this.out = out;
     }
 
-    private void retrieveInventoryListing(final String vaultName, final String jobId) {
+    private int retrieveInventoryListing(final String vaultName, final String jobId) {
         log.info("Retrieving inventory for job id {}...", jobId);
 
         try {
@@ -68,16 +68,18 @@ public class ReceiveArchivesListCommand extends AbstractCommand {
 
             printer.setInventory(content.toString());
             printer.printInventory(out);
+            return OK_RETURN_CODE;
         } catch (final AmazonClientException | IOException e) {
             log.error(e.getLocalizedMessage(), e);
+            return AMAZON_CLIENT_EXCEPTION_RETURN_CODE;
         }
     }
 
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
         final String vaultName = options.valueOf(optionParser.vault);
         final String jobId = options.valueOf(optionParser.inventoryListing);
-        this.retrieveInventoryListing(vaultName, jobId);
+        return this.retrieveInventoryListing(vaultName, jobId);
     }
 
     @Override

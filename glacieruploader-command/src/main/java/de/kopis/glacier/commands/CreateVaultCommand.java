@@ -50,7 +50,7 @@ public class CreateVaultCommand extends AbstractCommand {
         this.out = out;
     }
 
-    private void createVault(final String vaultName) {
+    private int createVault(final String vaultName) {
         Validate.notNull(vaultName, "vaultName can not be null");
         log.info("Creating vault {}...", vaultName);
 
@@ -62,15 +62,17 @@ public class CreateVaultCommand extends AbstractCommand {
             final DescribeVaultRequest describeVaultRequest = new DescribeVaultRequest().withVaultName(vaultName);
             final DescribeVaultResult describeVaultResult = client.describeVault(describeVaultRequest);
             printer.printVault(describeVaultResult, out);
+            return OK_RETURN_CODE;
         } catch (final AmazonClientException e) {
             log.error("Couldn't create vault.", e);
+            return AMAZON_CLIENT_EXCEPTION_RETURN_CODE;
         }
     }
 
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
         final String vaultName = options.valueOf(optionParser.vault);
-        this.createVault(vaultName);
+        return this.createVault(vaultName);
     }
 
     @Override

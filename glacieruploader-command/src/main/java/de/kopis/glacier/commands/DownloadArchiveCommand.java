@@ -56,11 +56,12 @@ public class DownloadArchiveCommand extends AbstractCommand {
     }
 
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
         final String vaultName = options.valueOf(optionParser.vault);
         final String archiveId = options.valueOf(optionParser.download);
         final File targetFile = options.valueOf(optionParser.targetFile);
         this.download(vaultName, archiveId, targetFile);
+        return OK_RETURN_CODE;
     }
 
     @Override

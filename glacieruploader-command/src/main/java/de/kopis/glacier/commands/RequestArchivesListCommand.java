@@ -39,7 +39,7 @@ public class RequestArchivesListCommand extends AbstractCommand {
         super(client, sqs, sns);
     }
 
-    private void startInventoryListing(final String vaultName) {
+    private int startInventoryListing(final String vaultName) {
         Validate.notNull(vaultName, "vaultName can not be null");
         log.info("Starting inventory listing for vault {}...", vaultName);
 
@@ -51,17 +51,19 @@ public class RequestArchivesListCommand extends AbstractCommand {
             final InitiateJobResult initJobResult = client.initiateJob(initJobRequest);
             final String jobId = initJobResult.getJobId();
             log.info("Inventory Job created with ID {}", jobId);
+            return OK_RETURN_CODE;
         } catch (final AmazonClientException e) {
             log.error(e.getLocalizedMessage(), e);
+            return AMAZON_CLIENT_EXCEPTION_RETURN_CODE;
         }
 
         // TODO wait for job, but it could take about 4 hours says the SDK...
     }
 
     @Override
-    public void exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
+    public int exec(OptionSet options, GlacierUploaderOptionParser optionParser) {
         final String vaultName = options.valueOf(optionParser.vault);
-        this.startInventoryListing(vaultName);
+        return this.startInventoryListing(vaultName);
     }
 
     @Override
